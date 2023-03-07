@@ -1,0 +1,55 @@
+version: "3"
+services:
+  db-demo:
+    container_name: db-demo
+    image: postgres:latest
+    networks:
+      - net_demo
+    environment:
+      - POSTGRES_PASSWORD=passwd
+      - POSTGRES_DB=demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - prod_postgresql:/var/lib/postgresql
+      - prod_postgresql_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=aleyoshimatsu@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=passwd
+    ports:
+      - "16543:80"
+    depends_on:
+      - db-demo
+    networks:
+      - net_demo
+
+  demo:
+    container_name: demo
+    image: demo:build_${BUILD_NUMBER}
+    build:
+      context: .
+      #args:
+        #- WAR_FILE=target/tasks-backend.war
+        #- CONTEXT=tasks-backend
+    networks:
+      - net_demo
+    #ports:
+    #  - 9998:8080
+    environment:
+      - DATABASE_HOST=db-demo
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWD=passwd
+      - DATABASE_UPDATE=none
+    depends_on:
+      - db-demo
+
+networks:
+  net_demo:
+
+volumes:
+  prod_postgresql:
+  prod_postgresql_data:

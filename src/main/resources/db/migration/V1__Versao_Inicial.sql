@@ -1,0 +1,5 @@
+CREATE TABLE usuario (
+  Id BIGINT NOT NULL,
+   Nome TEXT,
+   CONSTRAINT PK_Usuario PRIMARY KEY (Id)
+);
